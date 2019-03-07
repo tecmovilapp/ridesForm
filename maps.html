@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>containsLocation()</title>
+    <style>
+        /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+        #map {
+            height: 100%;
+        }
+
+        /* Optional: Makes the sample page fill the window. */
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        // This example requires the Geometry library. Include the libraries=geometry
+        // parameter when you first load the API. For example:
+        // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=geometry">
+
+        function initMap() {
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 14.07864, lng: -87.17669 },
+                zoom: 15,
+            });
+
+            //TODO: Get Zones Polygons Here https://www.doogal.co.uk/polylines.php
+            var triangleCoords = [
+                new google.maps.LatLng(14.07864, -87.17669),
+                new google.maps.LatLng(14.06832, -87.18188),
+                new google.maps.LatLng(14.06582, -87.18587),
+                new google.maps.LatLng(14.06869, -87.1948),
+                new google.maps.LatLng(14.07606, -87.19553),
+                new google.maps.LatLng(14.08048, -87.19269),
+                new google.maps.LatLng(14.08189, -87.18445),
+            ];
+
+            var bermudaTriangle = new google.maps.Polygon({
+                paths: triangleCoords,
+                strokeColor: '#FF0000',
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: '#FF0000',
+                fillOpacity: 0.35,
+                clickable: false
+            });
+
+            
+            this.attachPolygonInfoWindow(bermudaTriangle);
+
+            bermudaTriangle.setMap(map);
+
+
+
+            google.maps.event.addListener(map, 'click', function (e) {
+                if(google.maps.geometry.poly.containsLocation(e.latLng, bermudaTriangle)){
+                    alert("Dentro de Zona 1");
+                }else{
+                    alert("Fuera de Zona 1");
+                }
+
+
+                var resultColor =
+                    google.maps.geometry.poly.containsLocation(e.latLng, bermudaTriangle) ?
+                        'blue' :
+                        'red';
+
+                var resultPath =
+                    google.maps.geometry.poly.containsLocation(e.latLng, bermudaTriangle) ?
+                        // A triangle.
+                        "m 0 -1 l 1 2 -2 0 z" :
+                        google.maps.SymbolPath.CIRCLE;
+
+                new google.maps.Marker({
+                    position: e.latLng,
+                    map: map,
+                    icon: {
+                        path: resultPath,
+                        fillColor: resultColor,
+                        fillOpacity: .2,
+                        strokeColor: 'white',
+                        strokeWeight: .5,
+                        scale: 10
+                    }
+                });
+            });
+        }
+
+        function attachPolygonInfoWindow(polygon) {
+            var infoWindow = new google.maps.InfoWindow();
+            google.maps.event.addListener(polygon, 'mouseover', function (e) {
+                infoWindow.setContent("Polygon Name");
+                var latLng = e.latLng;
+                infoWindow.setPosition(latLng);
+                infoWindow.open(map);
+            });
+        }
+    </script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCmz7oHEd5LqSGdal0vtfWUOkxn9GSUKt4&libraries=geometry&callback=initMap"
+        async defer></script>
+</body>
+
+</html>
